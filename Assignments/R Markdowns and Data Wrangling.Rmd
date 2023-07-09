@@ -1,0 +1,155 @@
+---
+title: "Rosario_week3"
+author: "Gabriela Rosario"
+output: html_document
+date: "2023-06-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 3.1
+
+** **
+
+**1. In your own words, explain the purpose of the YAML of an R Markdown file. What does it do / what is it for?**
+
+YAML, is the abbreviated term for "Yet Another Makeup Language" and is used to refer to the metadata that controls the formatting of R Markdown documents/files. Using YAML the user is able to input the title, author, date, and file output type.
+
+** **
+
+**2. Imagine you’re working on an R Markdown file. You set one code chunk to `include = FALSE`. What will happen to the contents of that code chunk when you knit the file? What parts–if any–of the code chunk will be displayed in the knit file?**
+
+When you set one code chunk to `include = FALSE` in an R Markdown file and knit it, none of that chunk's content - that is the code, outputs, and messages - will be displayed in the new html file. An example of this is the setup chunk that is used in the beginning of R Markdown files which are not shown in the knit file.
+
+** **
+
+#### 3. You are studying native bee populations and need to wrangle your dataset to be ready for someone else to take on analysis. **This question has multiple parts, be sure to answer all components!** Each sub-question should be in its own code chunk.
+
+**3A. Load the `dplyr` and `magrittr` packages and read in the example bee data (“bees.csv”) into R and check its structure. How many rows / columns are there?**
+
+There are a total of 8 rows and 5 columns.
+
+```{r load, message=FALSE, warning=FALSE}
+
+# load dplyr and magrittr
+library(dplyr)
+library(magrittr)
+
+# read and assign the dataset 'bees (1).csv' to a vector 
+bee_data <- read.csv(file = "bees (1).csv")
+
+# check structure of 'bee_data'
+str(bee_data)
+```
+
+**3B. Your advisor reminds you that 2021 was a tough year for field research and those data are likely not reliable. Use the `filter` function to remove all data on bees identified in 2021.**
+
+```{r filter, message=FALSE, warning=FALSE}
+
+# filter 'bee_data' to remove all data from 2021
+bee_data2 <- dplyr::filter(.data = bee_data, year != "2021")
+
+# load dataset
+bee_data2
+
+```
+
+**3C. You also realize that your methods are not well-suited to capturing kleptoparasitic bee abundance so those values are not reliable enough to pass on to analysis. Use the `select` function to remove this column from the subset you just created.**
+
+```{r select, message=FALSE, warning=FALSE}
+
+# select 'bee_data' to remove all data for kleptoparasite bees
+bee_data3 <- dplyr::select(.data = bee_data2, -"kleptoparasite_bees")
+
+# load dataset
+bee_data3
+```
+
+**3D. You feel that the data you have now are clean enough to continue. However, your collaborator wants a column for the total bee abundance in each year. Use the `mutate` function to create the column your collaborator has requested from the data version created by the above step.**
+
+```{r mutate, message=FALSE, warning=FALSE}
+
+# mutate 'bee_data' to add a new column that calculates the total bee abundance for each year
+
+bee_data4 <- dplyr::mutate(.data = bee_data3, total_bee_abundance = mason_bees + sweat_bees + carpenter_bees)
+
+# load dataset
+bee_data4
+
+```
+
+**3E. Your collaborator loves the final data product you created! But they looked at your code and they think it can be streamlined. Copy the code you just wrote (`filter`, `select`, and `mutate`) and use the pipe operator (`%>%`) to write a version that does all three steps without creating intermediary objects. Check the structure of the final object.**
+
+```{r pipeline, message=FALSE, warning=FALSE}
+
+# read and assign the dataset 'bees (1).csv' to a vector 
+
+bee_data <- read.csv(file = "bees (1).csv")
+
+# filter, select, and mutate the 'bee_data' using a pipeline to produce the same results
+
+bee_data_end <- bee_data %>%
+  dplyr::filter(year != "2021") %>%
+  dplyr::select(-"kleptoparasite_bees") %>%
+  dplyr::mutate(total_bee_abundance = mason_bees + sweat_bees + carpenter_bees) %>%
+  dplyr::ungroup()
+
+
+# check structure of "bee_data_end"
+
+str(bee_data_end)
+  
+```
+
+** **
+
+#### 4. Your data wrangling skills are so impressive to your collaborator that they ask for your help with a lichen project they have been working on. This question has multiple parts, be sure to answer all components! Each sub-question should be in its own code chunk.
+
+**4A. Load the `tidyr` package and read in the example lichen data (“tree_lichen.csv”) into R and check its structure? What columns are included?**
+
+The columns included are 'tree', 'lichen_foliose', 'lichen_fruticose', 'lichen_crustose'.
+
+```{r tidyr, message=FALSE, warning=FALSE}
+
+# load 'tidyr'
+
+library(tidyr)
+
+# read and assign the dataset 'tree_lichen.csv' to a vector 
+
+lichen_data <- read.csv(file = "tree_lichen.csv")
+
+# check the structure of 'lichen_data'
+
+str(lichen_data)
+  
+```
+
+**4B. Your collaborator tells you that they have already cleaned the data but the data shape isn’t exactly what they need. They want your help reshaping the data into long format. Use the `pivot_longer` function to reshape their data so that they have the following three columns: “tree” unchanged from the wide format version; “lichen_type” which includes whether the lichen is crustose, foliose, or fruticose; “percent_cover” which includes the percent cover values your collaborator measured in the field.**
+
+```{r pivot, message=FALSE, warning=FALSE}
+
+# pivot the shape of 'lichen_data' to make it longer, and make the three columns "tree", "lichen_type", and "percent_cover"
+
+lichen_data_long <- lichen_data %>%
+  pivot_longer(names_to = "lichen_type", values_to = "percent_cover", cols = -tree)
+
+# load 'lichen_data_long'
+
+lichen_data_long
+
+```
+
+**4C. Check the structure of the long format object you created. How many rows are there?**
+
+There are 30 rows.
+
+```{r lichenstructure, message=FALSE, warning=FALSE}
+
+# check the structure of the long format of 'lichen_data'
+
+str(lichen_data_long)
+
+```

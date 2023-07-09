@@ -1,0 +1,71 @@
+---
+title: "Rosario_Week5"
+author: "Gabriela Rosario"
+date: "2023-07-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+** **
+
+#### 1. You hypothesize that penguin flipper length differs between sexes and that the degree of difference between sexes is related to the species of penguin (i.e., sex and species are interacting). Test your hypothesis using the “penguins” dataset in the `palmerpenguins` package
+
+**1A. What is the name of the most appropriate statistical test? Why is it the correct test for this question?**
+
+The most appropriate statistical test in this scenario would be Analysis of Co-Variance (ANCOVA). The test will use interacting explanatory variables (sex and species), which only allows you to choose between a generalized linear model and an ANCOVA. Since the response variable that's being tested is flipper length, it falls under continous data which further limits the statistical test to an ANCOVA.
+
+**1B. In a code chunk, fit the model you have chosen and generate a summary table of the relevant information. Remember to remove any penguins that don’t have a recorded sex!**
+
+```{r ANCOVA, message=FALSE, warning=FALSE}
+
+# load package
+library(palmerpenguins)
+
+# subset penguins data to only include penguins with recorded sex
+peng_df <- subset(penguins, !is.na(sex))
+
+# run an ANCOVA test
+peng_aov <- aov(flipper_length_mm ~ sex * species, peng_df)
+
+# interpret results
+summary(peng_aov)
+
+```
+
+**1C. Based on the summary table you just generated, is your hypothesis supported? What information in the summary table allows you to draw this conclusion?**
+
+My hypothesis was supported. The p-value of the test examining the relationships between flipper length and sexes, as well as flipper length and species, resulted in <2.2e-16 (i.e <0.00000000000000022) for both and therefore was significant, meaning that the null hypothesis was rejected. Similarly the p-value of the test examining the relationship between sex and species resulted in 0.00631, which was also found to be significant, therefore proving that the degree of difference between sexes is related to the species of penguin.
+
+** **
+
+#### 2. You present on your work at a professional society’s annual meeting and people are really excited about this finding! A colleague approaches you afterwards and asks you whether you’ve used multi-model inference to check to see if including the home island of the penguin improves your model’s explanatory power. You realize this is a great idea and decide to pursue it immediately
+
+**2A. Fit a model with sex and species interacting and add a term for island (no interaction term). Fit another model where sex, species, and island are all included as explanatory variables and they are all allowed to interact.**
+
+```{r model, message=FALSE, warning=FALSE}
+
+# Fit a model with sex and species interacting and add a term for island
+model1 <- aov(flipper_length_mm ~ island + sex * species, peng_df)
+
+# Fit a model where sex, species, and island are all included and allowed to interact.
+model2 <- aov(flipper_length_mm ~ island * sex * species, peng_df)
+
+```
+
+**2B. Using the `AIC` function, compare these two new models with your original model. Which model has the most explanatory power? How do you know?**
+
+Technically, the model with the most explanatory power would be model1 since it has the lowest AIC value (2105.06), however models with <2 AIC points difference are basically the same strength of fit. This means that because model2 and the original model have similar values to model1 (2106.71 and 2016.86 respectively), they share the same strength of fit as model1, making none of them have the most explanatory power.
+```{r AIC, message=FALSE, warning=FALSE}
+
+# run an AIC
+peng_aic <- AIC(model1, model2, peng_aov)
+
+# interpret results
+peng_aic
+
+```
+
+

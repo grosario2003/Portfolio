@@ -1,0 +1,128 @@
+---
+title: "Rosario_week4"
+author: "Gabriela Rosario"
+date: "2023-06-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+** **
+
+#### 1. A friend asks for your help wrangling some data for a summer project they did on tomatoes. Your friend tells you the "tomato.csv" file includes data on the number of buds, flowers, and fruits from 10 tomato plants they measured in a greenhouse. These plants either received no treatment or had Nitrogen added to their soil. Treatment information is listed in "tomato_treatment.csv". Finally, some plants had some issues that your friend recorded in a third file just in case they needed to account for that in the statistics later on. This question has multiple parts, be sure to answer all components! Each sub-question should be in its own code chunk.
+
+
+**1A. Load the `dplyr` package and read in the three data files they shared with you: (1) "tomato.csv", "tomato_treatment.csv", and "tomato_issues.csv". Check the structure of all three files.**
+
+```{r load, message=FALSE, warning=FALSE}
+
+# load dplyr
+library(dplyr)
+
+# read and assign "tomato.csv", "tomato_treatment.csv", and "tomato_issues.csv" each to an object
+tomato <- read.csv("tomato.csv")
+
+tomato_treatment <- read.csv("tomato_treatment.csv")
+
+tomato_issues <- read.csv("tomato_issues.csv")
+
+# check structure of each object
+str(tomato)
+
+str(tomato_treatment)
+
+str(tomato_issues)
+
+```
+
+**1B. Your friend first wants you to attach the treatment information to the main data file. Do this with a join (by plant) so that no rows are lost and check the structure of the resulting object.**
+
+```{r fulljoin, message=FALSE, warning=FALSE}
+
+# create a full join with 'tomato' and 'tomato_treatment' in order to avoid losing rows
+full_tomato_df <- full_join(tomato,tomato_treatment,"plant")
+
+# check structure 
+str(full_tomato_df)
+
+```
+
+
+**1C. Your friend has decided they do want to drop some of the plants that had issues after all. They want to remove the problem plants if they had either herbivore damage or a fungal infection (they are okay including over-watered plants in the final data). Using `filter` and an appropriate `join` of your choice, remove the plants your friend wants excluded from the data object you created in the previous part of this question. Check the structure of this object.**
+
+```{r antijoin, message=FALSE, warning=FALSE}
+
+# filter 'tomato_issue' to include only data from herbivore damage or fungal infection
+tomato_issue2 <- dplyr::filter(.data = tomato_issues, problem %in% c("herbivore damage", "fungal infection"))
+
+# create an anti join in order to remove plants in 'tomato_issue2' from 'full_tomato_df'
+end_tomato_df <- anti_join(full_tomato_df,tomato_issue2,"plant")
+
+# check structure
+str(end_tomato_df)
+```
+
+** **
+
+#### 2. Let's revisit the penguin data from the `palmerpenguins` package to practice some statistics! This question has multiple parts, be sure to answer all components! Each sub-question should be in its own code chunk.
+
+**2A. Load the `palmerpenguins` package and check the structure of the `penguins` data object.**
+
+```{r penguins, message=FALSE, warning=FALSE}
+
+# load 'palmerpenguins'
+library(palmerpenguins)
+
+# check structure of the 'penguins' data object
+str(palmerpenguins::penguins)
+
+```
+
+**2B. For all columns, identify whether each column is "discrete" (aka "categorical") or "continuous".**
+
+**species:** categorical/discrete
+
+**island:** categorical/discrete
+
+**bill_length_mm:** continuous
+
+**bill_depth_mm:** continuous
+
+**flipper_length_mm:** continuous
+
+**body_mass_g:** continuous
+
+**sex:** categorical/discrete
+
+**year:** categorical/discrete
+
+
+**2C. Now that you've identified the data type of each column, let's do some statistics! Your hypothesis is that flipper length differs between male and female penguins. Fit the correct test and run `summary` on the model fit object. Was your hypothesis supported? How do you know? (Remember you can check the “roadmap” we covered in class!)**
+
+My hypothesis was supported. The p-value of the test resulted in 2.39e-06 (i.e 0.00000239) and therefore was significant, meaning that the null hypothesis was rejected.
+
+```{r anova, message=FALSE, warning=FALSE}
+
+# conduct an Analysis of Variance (ANOVA) to test hypothesis
+flipper_aov <- aov(flipper_length_mm ~ sex, penguins)
+
+# run a summary to interpret results
+summary(flipper_aov)
+
+```
+
+**2D. You hypothesize that penguins with a higher body mass have longer flippers. Fit the correct test and run `summary` on the model fit object. Was your hypothesis supported? How do you know?**
+
+My hypothesis was supported. The p-value of the test resulted in <2.2e-16 (i.e <0.00000000000000022) and therefore was significant, meaning that the null hypothesis was rejected.
+
+```{r regression, message=FALSE, warning=FALSE}
+
+# conduct a Regression to test hypothesis
+flipper_aov2 <- lm(flipper_length_mm ~ body_mass_g, penguins)
+
+# run a summary to interpret results
+summary(flipper_aov2)
+
+```

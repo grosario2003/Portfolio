@@ -1,0 +1,129 @@
+---
+title: "Function Tutorial"
+author: "Gabriela Rosario"
+date: "2023-06-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## {.tabset}
+
+### read.fs.volume
+
+#### **read.fs.volume**
+
+`read.fs.volume` is a function within the `freesurferformats` package, which contains a series of functions that are designed to read and process MRI data that is normally viewed on the *Freesurfer* software.
+
+The `read.fs.volume` function is used to read a volume file from FreeSurfer into an R object. It takes the path to the volume file as an input and returns an object, specifically an array, representing the volume data (in mm^3^).
+
+**Basic Syntax:** `read.fs.volume(volume_file)`
+  
+`volume_file`: The function uses MGH (named after *Massachusetts General Hospital*) and MGZ (gzipped version of MGH) files. They often provide 3D images of brain MRI scans, or morphometry data for brain surfaces, built up in units called voxels. Each voxel represents about million brain cells.
+
+**Example:**
+
+```{r freesurfer, message=FALSE, warning=FALSE}
+
+# load package
+library(freesurferformats)
+
+# load example brain data 
+example_brain <- system.file("extdata", "brain.mgz", package = "freesurferformats", mustWork = TRUE);
+
+# read the volume from file
+brain_volume <- read.fs.volume(example_brain)
+
+# you can also upload mgz or mgh files directly from your repository folder by using 'image_read("file_name")
+
+# check structure of 'brain_volume'
+str(brain_volume)
+
+# using this data, you can perform operations or analysis on brain volume
+
+# calculate the minimum volume per voxel
+min(brain_volume)
+
+# calculate the maximum volume per voxel
+max(brain_volume)
+ 
+# calculate the mean volume per voxel
+mean(brain_volume) 
+```
+
+
+### image_animate
+
+#### **image_animate**
+
+The `image_animate` function is a part of the `magick` package in R. It is used to create GIFs by animating sequences of individual images.
+
+**Basic Syntax:** `image_animate(image, fps = 10, dispose = "previous")`
+
+`image`: A sequence of individual image objects. This can be done using assigning multiple images to one object using  `image_read` and concatenation (`c("image_file1","image_file2",...)`), or assigning each image to their own object and then assigning all the objects to a vector using concatenation.
+
+`fps`: Frames per second (i.e the speed of the animation). The default value is 10.
+
+`dispose`: Specifies the method used for disposing of the previous frame before rendering the next frame. The default value is "previous", which means each frame replaces the previous frame.
+
+**Example:**
+
+```{r gif1, message=FALSE, warning=FALSE}
+
+# load package
+library(magick)
+
+# Read images from URL and assign them to an object
+total_images <- image_read(c("https://images.unsplash.com/photo-1516571748831-5d81767b788d?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&dl=klemen-vrankar-lcT_p8kLCsc-unsplash.jpg&w=500", "https://images.unsplash.com/photo-1559571416-d11cec5fc4dc?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&dl=jose-maria-garcia-garcia-eU--lob11iw-unsplash.jpg&w=500","https://images.unsplash.com/photo-1576806157689-f8fa4f3a82fd?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&dl=bradley-allweil-3jGU345xw2w-unsplash.jpg&w=500", "https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&dl=wil-stewart-T26KCgCPsCI-unsplash.jpg&w=500", "https://images.unsplash.com/photo-1547501344-5301c9fb9edf?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&dl=nikolay-hristov-qTN7y0IyG4w-unsplash.jpg&w=500", "https://images.unsplash.com/photo-1557162629-292e018d65ff?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&dl=zhanjiang-chen-2TWVY8WkzNY-unsplash.jpg&w=500"))
+
+# You can also upload images directly from your repository folder by using 'image_read("file_name")'
+
+# Create an animated image using image_animate from the magick package
+animated_gif <- image_animate(total_images, fps = 4)
+
+# load finished gif
+animated_gif
+
+```
+
+**All images were obtained through the open source website: [www.unsplash.com](https://unsplash.com/)**
+
+
+
+### str_sub
+
+#### **str_sub**
+
+`str_sub` is a function in the `stringr` package that extracts substrings from character vectors based on specific start and end positions.
+
+
+**Basic Syntax:** `str_sub(string, start, end)`
+
+
+`string`: The character vector/object where substrings will be extracted from
+
+`start`: The starting position of the substring. It can be a numeric value, a vector of numeric values, or a single integer specifying the starting position.
+
+`end`: The ending position(s) of the substring(s). It can be a numeric value, a vector of numeric values, or a single integer specifying the ending position.
+
+**Example:**
+
+```{r substrings, message=FALSE, warning=FALSE}
+
+# load package
+library(stringr)
+
+# create a string and assign it to an object
+greeting <- "Hi There!"
+
+# extract a substring using start and end positions
+shortened_greeting <- str_sub(greeting, start = 1, end = 2)
+print(shortened_greeting)
+
+# extract a substring using negative start and end positions
+shortened_greeting2 <- str_sub(greeting, start = -6, end = -2)
+print(shortened_greeting2)
+
+```
